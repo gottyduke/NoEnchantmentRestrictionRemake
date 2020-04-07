@@ -12,5 +12,5 @@
 Setting | Description
 --- | ---
 `disenchantEverything` | Enables the ability to disenchant everything, such as artifacts.
-`unlimitedEnchantment` | Enables the ability to apply as many enchantments as you want to enchantee.
+`unlimitedEnchantment` | Enables the ability to apply as many enchantments as you want on enchantee.
 `enchantSlotsOverride` | How many slots of enchantments you can put on enchantee.
