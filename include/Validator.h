@@ -14,39 +14,36 @@ public:
 	using Ench = RE::EnchantmentItem*;
 	using Keyw = RE::BGSKeyword*;
 
-	static Validator* GetSingleton();
-
 	// Collect valid enchantments
 	void PreloadEnchantmentList();
 	void PreloadKeywordList();
+	
 	template <typename T>
-	void PreloadKeywordList(RE::BSTArray<T*> a_array);
+	void PreloadKeywordList(RE::BSTArray<T*>& a_array);
 
-	[[nodiscard]] size_t GetKeywordsAmount() const;
-	[[nodiscard]] size_t GetEnchantmentsAmount() const;
+	[[nodiscard]] std::size_t GetKeywordsAmount() const noexcept { return _keywords.size(); }
+	[[nodiscard]] std::size_t GetEnchantmentsAmount() const noexcept { return _enchantments.size(); }
+
+	std::unordered_set<Keyw>& GetLoadedKeywords() noexcept { return _keywords; }
+	std::unordered_set<Ench>& GetLoadedEnchantments() noexcept { return _enchantments; };
 
 	void DumpStats();
 
-	std::unordered_set<Ench>& GetLoadedEnchantments();
-	std::unordered_set<Keyw>& GetLoadedKeywords();
-
+	Validator() = default;
+	~Validator() = default;
+	
 	Validator(const Validator&) = delete;
 	Validator(Validator&&) = delete;
 
 	Validator& operator=(const Validator&) = delete;
 	Validator& operator=(Validator&&) = delete;
 
-protected:
-
-	Validator() = default;
-	~Validator() = default;
-
-
-	static Ench NestedValidate(Ench a_ench);
+	Validator* operator->() { return this; }
+private:
+	Ench NestedValidate(Ench a_ench);
 
 	void TryFillStats(Ench a_ench);
 
-private:
 	std::unordered_set<Ench> _enchantments;
 	std::unordered_set<Keyw> _keywords;
 

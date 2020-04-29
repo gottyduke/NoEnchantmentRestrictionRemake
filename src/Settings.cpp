@@ -13,6 +13,7 @@ bool Settings::LoadSettings(const bool a_dumpParse)
 }
 
 
-decltype(Settings::disenchantEverything)	Settings::disenchantEverything("disenchantEverything", true);
-decltype(Settings::unlimitedEnchantment)	Settings::unlimitedEnchantment("unlimitedEnchantment", false);
-decltype(Settings::enchantsSlotOverride)	Settings::enchantsSlotOverride("enchantsSlotOverride", 0);
+decltype(Settings::disenchantEverything)	Settings::disenchantEverything("DisenchantEverything", true);
+decltype(Settings::disenchantNotDestory)	Settings::disenchantNotDestory("DisenchantNotDestroy", true);
+decltype(Settings::unlimitedEnchantment)	Settings::unlimitedEnchantment("UnlimitedEnchantment", true);
+decltype(Settings::enchantSlotsOverride)	Settings::enchantSlotsOverride("EnchantSlotsOverride", 0);

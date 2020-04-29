@@ -13,10 +13,10 @@ public:
 	static bool LoadSettings(bool a_dumpParse = false);
 	
 	static J2S::bSetting	disenchantEverything;
+	static J2S::bSetting	disenchantNotDestory;
 	static J2S::bSetting	unlimitedEnchantment;
-	static J2S::iSetting	enchantsSlotOverride;
+	static J2S::iSetting	enchantSlotsOverride;
 	
-
 private:
-	static constexpr char* FILE_NAME = "Data\\SKSE\\Plugins\\NoEnchantmentRestrictionsSSE.json";
+	static constexpr auto FILE_NAME = R"(Data\SKSE\Plugins\NoEnchantmentRestrictionRemake.json)";
 };

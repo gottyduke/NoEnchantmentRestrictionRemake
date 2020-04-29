@@ -1,4 +1,5 @@
 ﻿#include "FormManipulator.h"
+#include "Hooks.h"
 #include "Settings.h"
 #include "Validator.h"
 #include "version.h"
@@ -10,19 +11,8 @@ namespace
 {
 	void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 	{
-		switch (a_msg->type) {
-		case SKSE::MessagingInterface::kDataLoaded:
-			{
-				FormManipulator::TryReplaceForm();
-
-				if (*Settings::unlimitedEnchantment) {
-					FormManipulator::TryReformData();
-				}
-
-				Validator::GetSingleton()->DumpStats();
-			}
-			break;
-		default: ;
+		if (a_msg->type == SKSE::MessagingInterface::kDataLoaded) {
+			FormManipulator::TryReplaceForm();
 		}
 	}
 }
@@ -32,17 +22,17 @@ extern "C"
 {
 bool SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
 {
-	SKSE::Logger::OpenRelative(FOLDERID_Documents,
-	                           L"\\My Games\\Skyrim Special Edition\\SKSE\\NoEnchantmentRestrictionsSSE.log");
+	SKSE::Logger::OpenRelative(FOLDERID_Documents, L"\\My Games\\Skyrim Special Edition\\SKSE\\NoEnchantmentRestrictionRemake.log");
 	SKSE::Logger::SetPrintLevel(SKSE::Logger::Level::kDebugMessage);
 	SKSE::Logger::SetFlushLevel(SKSE::Logger::Level::kDebugMessage);
 	SKSE::Logger::UseLogStamp(true);
+	SKSE::Logger::TrackTrampolineStats(true);
 
-	_MESSAGE("NoEnchantmentRestrictionsSSE Remake v%s", ENCH_VERSION_VERSTRING);
+	_MESSAGE("NoEnchantmentRestrictionRemake v%s", NERR_VERSION_VERSTRING);
 
 	a_info->infoVersion = SKSE::PluginInfo::kVersion;
-	a_info->name = "NoEnchantmentRestrictionsSSE";
-	a_info->version = ENCH_VERSION_MAJOR;
+	a_info->name = "NoEnchantmentRestrictionRemake";
+	a_info->version = NERR_VERSION_MAJOR;
 
 	if (a_skse->IsEditor()) {
 		_FATALERROR("Loaded in editor, marking as incompatible!\n");
@@ -61,12 +51,17 @@ bool SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_in
 
 bool SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
 {
-	_MESSAGE("NoEnchantmentRestrictionsSSE Remake loaded");
+	_MESSAGE("NoEnchantmentRestrictionRemake loaded");
 
 	if (!Init(a_skse)) {
 		return false;
 	}
 
+	if (!Settings::LoadSettings()) {
+		_FATALERROR("Failed to load settings");
+		return false;
+	}
+	
 	const auto messaging = SKSE::GetMessagingInterface();
 	if (messaging->RegisterListener("SKSE", MessageHandler)) {
 		_MESSAGE("Messaging interface registration successful");
@@ -75,6 +70,14 @@ bool SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
 		return false;
 	}
 
+	if (!SKSE::AllocTrampoline(1 << 5)) {
+		_FATALERROR("Failed to allocate trampoline");
+		return false;
+	}
+	
+	Hooks::InstallHooks();
+	
+	_MESSAGE("Finished");
 	return true;
 }
-};
+}

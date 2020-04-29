@@ -1,4 +1,4 @@
-LIBRARY	"NoEnchantmentRestrictionsSSE"
+LIBRARY ""
 EXPORTS
 SKSEPlugin_Query
 SKSEPlugin_Load
