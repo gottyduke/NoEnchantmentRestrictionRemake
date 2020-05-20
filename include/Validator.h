@@ -17,7 +17,7 @@ public:
 	// Collect valid enchantments
 	void PreloadEnchantmentList();
 	void PreloadKeywordList();
-	
+
 	template <typename T>
 	void PreloadKeywordList(RE::BSTArray<T*>& a_array);
 
@@ -27,11 +27,9 @@ public:
 	std::unordered_set<Keyw>& GetLoadedKeywords() noexcept { return _keywords; }
 	std::unordered_set<Ench>& GetLoadedEnchantments() noexcept { return _enchantments; };
 
-	void DumpStats();
-
 	Validator() = default;
-	~Validator() = default;
-	
+	~Validator() { this->DumpStats(); }
+
 	Validator(const Validator&) = delete;
 	Validator(Validator&&) = delete;
 
@@ -43,6 +41,7 @@ private:
 	Ench NestedValidate(Ench a_ench);
 
 	void TryFillStats(Ench a_ench);
+	void DumpStats();
 
 	std::unordered_set<Ench> _enchantments;
 	std::unordered_set<Keyw> _keywords;

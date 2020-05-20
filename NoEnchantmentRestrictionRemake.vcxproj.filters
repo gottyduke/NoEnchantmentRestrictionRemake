@@ -6,7 +6,6 @@
     <ClInclude Include="include\Settings.h" />
     <ClInclude Include="include\FormManipulator.h" />
     <ClInclude Include="include\Hooks.h" />
-    <ClInclude Include="include\Events.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -14,7 +13,6 @@
     <ClCompile Include="src\Validator.cpp" />
     <ClCompile Include="src\Hooks.cpp" />
     <ClCompile Include="src\FormManipulator.cpp" />
-    <ClCompile Include="src\Events.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />

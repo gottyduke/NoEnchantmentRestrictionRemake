@@ -1,7 +1,6 @@
 ﻿#include "FormManipulator.h"
 #include "Hooks.h"
 #include "Settings.h"
-#include "Validator.h"
 #include "version.h"
 
 #include "SKSE/API.h"
@@ -57,12 +56,15 @@ bool SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
 		return false;
 	}
 
-	if (!Settings::LoadSettings()) {
-		_FATALERROR("Failed to load settings");
+	if (Settings::LoadSettings()) {
+		_MESSAGE("Settings loaded successfully");
+	}
+	else {
+		_FATALERROR("Failed to load settings\n");
 		return false;
 	}
-	
-	const auto messaging = SKSE::GetMessagingInterface();
+
+	const auto* const messaging = SKSE::GetMessagingInterface();
 	if (messaging->RegisterListener("SKSE", MessageHandler)) {
 		_MESSAGE("Messaging interface registration successful");
 	} else {
@@ -74,10 +76,14 @@ bool SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
 		_FATALERROR("Failed to allocate trampoline");
 		return false;
 	}
+
+	if (Hooks::InstallHooks()) {
+		_MESSAGE("Hooks installed successfully");
+	} else {
+		_FATALERROR("Failed to install hooks!\n");
+		return false;
+	}
 	
-	Hooks::InstallHooks();
-	
-	_MESSAGE("Finished");
 	return true;
 }
 }

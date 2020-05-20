@@ -29,10 +29,8 @@
     <ClInclude Include="include\Settings.h" />
     <ClInclude Include="include\Validator.h" />
     <ClInclude Include="include\version.h" />
-    <ClInclude Include="include\Events.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Events.cpp" />
     <ClCompile Include="src\FormManipulator.cpp" />
     <ClCompile Include="src\Hooks.cpp" />
     <ClCompile Include="src\main.cpp" />

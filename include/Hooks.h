@@ -3,5 +3,5 @@
 
 namespace Hooks
 {
-	void InstallHooks();
+	bool InstallHooks();
 }

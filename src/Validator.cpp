@@ -32,7 +32,7 @@ void Validator::PreloadKeywordList()
 
 	PreloadKeywordList<RE::TESObjectARMO>(armorList);
 	PreloadKeywordList<RE::TESObjectWEAP>(weaponList);
-	
+
 	_keywords.erase(RE::TESForm::LookupByID<RE::BGSKeyword>(0x000C27BD));
 }
 
@@ -54,7 +54,7 @@ void Validator::PreloadKeywordList(RE::BSTArray<T*>& a_array)
 			if (form->GetKeywordAt(iter) == std::nullopt) {
 				continue;
 			}
-			
+
 			if (*Settings::disenchantEverything &&
 				form->GetKeywordAt(iter).value() == RE::TESForm::LookupByID<RE::BGSKeyword>(0x000C27BD)) {
 				form->keywords[iter] = emptyForm;
@@ -82,7 +82,7 @@ void Validator::TryFillStats(const Ench a_ench)
 {
 	auto file = a_ench->GetFile()->fileName;
 	if (_stats.find(file) == _stats.end()) {
-		_stats.insert({ file, 1 });
+		_stats.insert({file, 1});
 	} else {
 		_stats.at(file) += 1;
 	}
@@ -96,7 +96,7 @@ void Validator::DumpStats()
 		_MESSAGE("KWDA(%x)[%s]", it->GetFormID(), it->GetFormEditorID());
 	}
 #endif
-	
+
 	const auto total = _enchantments.size();
 	_MESSAGE("Stat report:");
 	_MESSAGE("Processed enchantments: %d", total);
@@ -104,7 +104,7 @@ void Validator::DumpStats()
 	for (auto it = _stats.begin(); it != _stats.end(); ++it) {
 		_MESSAGE("%-3d (%05.2f%%)[%s]", it->second, static_cast<float>(it->second) / total * 100, it->first);
 	}
-	
+
 	_MESSAGE("Registered %d keywords", GetKeywordsAmount());
 	_MESSAGE("Validator finished preloading");
 }

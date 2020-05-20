@@ -23,9 +23,7 @@ namespace FormManipulator
 		for (auto ench : validator->GetLoadedEnchantments()) {
 			ench->data.wornRestrictions = list;
 		}
-		
-		validator->DumpStats();
-		
+
 		_MESSAGE("Finished enchantment form replacing");
 	}
 }

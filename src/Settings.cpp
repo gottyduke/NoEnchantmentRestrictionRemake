@@ -8,12 +8,12 @@ bool Settings::LoadSettings(const bool a_dumpParse)
 	if (!log.empty()) {
 		_ERROR("%s", log.c_str());
 	}
-	
+
 	return success;
 }
 
 
-decltype(Settings::disenchantEverything)	Settings::disenchantEverything("DisenchantEverything", true);
-decltype(Settings::disenchantNotDestory)	Settings::disenchantNotDestory("DisenchantNotDestroy", true);
-decltype(Settings::unlimitedEnchantment)	Settings::unlimitedEnchantment("UnlimitedEnchantment", true);
-decltype(Settings::enchantSlotsOverride)	Settings::enchantSlotsOverride("EnchantSlotsOverride", 0);
+decltype(Settings::disenchantEverything) Settings::disenchantEverything("DisenchantEverything", true);
+//decltype(Settings::disenchantNotDestory)	Settings::disenchantNotDestory("DisenchantNotDestroy", true);
+decltype(Settings::unlimitedEnchantment) Settings::unlimitedEnchantment("UnlimitedEnchantment", true);
+decltype(Settings::enchantSlotsOverride) Settings::enchantSlotsOverride("EnchantSlotsOverride", 0);
