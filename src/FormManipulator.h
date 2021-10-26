@@ -3,5 +3,5 @@
 
 namespace FormManipulator
 {
-	void TryReplaceForm();
+	void ReplaceForm();
 }

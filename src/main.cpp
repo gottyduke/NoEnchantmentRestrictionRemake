@@ -1,9 +1,6 @@
-﻿#include "FormManipulator.h"
+#include "FormManipulator.h"
 #include "Hooks.h"
 #include "Settings.h"
-#include "version.h"
-
-#include "SKSE/API.h"
 
 
 namespace
@@ -11,36 +8,28 @@ namespace
 	void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 	{
 		if (a_msg->type == SKSE::MessagingInterface::kDataLoaded) {
-			FormManipulator::TryReplaceForm();
+			FormManipulator::ReplaceForm();
 		}
 	}
 }
 
 
-extern "C"
+extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface * a_skse, SKSE::PluginInfo * a_info)
 {
-bool SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
-{
-	SKSE::Logger::OpenRelative(FOLDERID_Documents, L"\\My Games\\Skyrim Special Edition\\SKSE\\NoEnchantmentRestrictionRemake.log");
-	SKSE::Logger::SetPrintLevel(SKSE::Logger::Level::kDebugMessage);
-	SKSE::Logger::SetFlushLevel(SKSE::Logger::Level::kDebugMessage);
-	SKSE::Logger::UseLogStamp(true);
-	SKSE::Logger::TrackTrampolineStats(true);
-
-	_MESSAGE("NoEnchantmentRestrictionRemake v%s", NERR_VERSION_VERSTRING);
+	DKUtil::Logger::Init(Version::PROJECT, Version::NAME);
 
 	a_info->infoVersion = SKSE::PluginInfo::kVersion;
-	a_info->name = "NoEnchantmentRestrictionRemake";
-	a_info->version = NERR_VERSION_MAJOR;
+	a_info->name = Version::PROJECT.data();
+	a_info->version = Version::MAJOR;
 
 	if (a_skse->IsEditor()) {
-		_FATALERROR("Loaded in editor, marking as incompatible!\n");
+		ERROR("Loaded in editor, marking as incompatible"sv);
 		return false;
 	}
 
 	const auto ver = a_skse->RuntimeVersion();
-	if (ver <= SKSE::RUNTIME_1_5_39) {
-		_FATALERROR("Unsupported runtime version %s!", ver.GetString().c_str());
+	if (ver < SKSE::RUNTIME_1_5_39) {
+		ERROR("Unsupported runtime version {}", ver.string());
 		return false;
 	}
 
@@ -48,42 +37,19 @@ bool SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_in
 }
 
 
-bool SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
+extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
 {
-	_MESSAGE("NoEnchantmentRestrictionRemake loaded");
+	INFO("{} loaded", Version::PROJECT);
 
-	if (!Init(a_skse)) {
+	SKSE::Init(a_skse);
+	SKSE::AllocTrampoline(1 << 5);
+
+	Hooks::InstallHooks();
+
+	const auto* const message = SKSE::GetMessagingInterface();
+	if (!message->RegisterListener(MessageHandler)) {
 		return false;
 	}
 
-	if (Settings::LoadSettings()) {
-		_MESSAGE("Settings loaded successfully");
-	}
-	else {
-		_FATALERROR("Failed to load settings\n");
-		return false;
-	}
-
-	const auto* const messaging = SKSE::GetMessagingInterface();
-	if (messaging->RegisterListener("SKSE", MessageHandler)) {
-		_MESSAGE("Messaging interface registration successful");
-	} else {
-		_FATALERROR("Messaging interface registration failed!\n");
-		return false;
-	}
-
-	if (!SKSE::AllocTrampoline(1 << 5)) {
-		_FATALERROR("Failed to allocate trampoline");
-		return false;
-	}
-
-	if (Hooks::InstallHooks()) {
-		_MESSAGE("Hooks installed successfully");
-	} else {
-		_FATALERROR("Failed to install hooks!\n");
-		return false;
-	}
-	
 	return true;
-}
 }

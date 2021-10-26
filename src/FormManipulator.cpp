@@ -4,7 +4,7 @@
 
 namespace FormManipulator
 {
-	void TryReplaceForm()
+	void ReplaceForm()
 	{
 		Validator validator;
 		validator->PreloadEnchantmentList();
@@ -14,16 +14,14 @@ namespace FormManipulator
 		auto list = factory->Create();
 
 		list->forms.resize(validator->GetKeywordsAmount());
-		std::size_t iter = 0;
-		for (auto keyword : validator->GetLoadedKeywords()) {
-			list->forms[iter] = keyword;
-			++iter;
+		for (auto& keyword : validator->GetLoadedKeywords()) {
+			list->forms.push_back(std::move(keyword));
 		}
 
-		for (auto ench : validator->GetLoadedEnchantments()) {
-			ench->data.wornRestrictions = list;
+		for (auto& ench : validator->GetLoadedEnchantments()) {
+			ench->data.wornRestrictions = std::move(list);
 		}
 
-		_MESSAGE("Finished enchantment form replacing");
+		INFO("Forms replaced"sv);
 	}
 }
