@@ -6,12 +6,11 @@ void Validator::PreloadEnchantmentList()
 	auto dataHandler = RE::TESDataHandler::GetSingleton();
 	auto& enchantments = dataHandler->GetFormArray<RE::EnchantmentItem>();
 	for (auto& enchantment : enchantments) {
-		auto base = NestedValidate(enchantment);
-		if (base && !base->fullName.empty() && !_enchantments.count(base)) {
+		if (auto base = NestedValidate(enchantment); 
+			base && !base->fullName.empty() && !_enchantments.count(base)) {
 			_enchantments.insert(base);
-
-			auto file = base->GetFile()->fileName;
-			if (!_stats.try_emplace(file, 1).second) {
+			if (auto file = base->GetFile()->fileName; 
+				!_stats.try_emplace(file, 1).second) {
 				++_stats.at(file);
 			}
 		}
@@ -42,19 +41,19 @@ void Validator::PreloadKeywordList(RE::BSTArray<T*>& a_array)
 	auto factory = RE::IFormFactory::GetConcreteFormFactoryByType<RE::BGSKeyword>();
 	const auto emptyForm = factory->Create();
 
-	for (auto form : a_array) {
+	for (auto& form : a_array) {
 		const auto count = form->GetNumKeywords();
 		if (count == 0) {
 			continue;
 		}
 
-		for (auto index = 0; index < count; ++index) {
+		for (std::uint32_t index = 0; index < count; ++index) {
 			if (form->GetKeywordAt(index) == std::nullopt) {
 				continue;
 			}
 
 			// DE option
-			if (form->GetKeywordAt(index).value() == RE::TESForm::LookupByID<RE::BGSKeyword>(0x000C27BD)) {
+			if (*Config::EnableDE && form->GetKeywordAt(index).value() == RE::TESForm::LookupByID<RE::BGSKeyword>(0x000C27BD)) {
 				form->keywords[index] = emptyForm;
 				--form->numKeywords;
 				continue;

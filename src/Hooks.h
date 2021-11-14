@@ -6,5 +6,5 @@
 
 namespace Hooks
 {
-	void InstallHooks();
+	void Install();
 }

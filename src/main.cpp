@@ -1,6 +1,6 @@
 #include "FormManipulator.h"
 #include "Hooks.h"
-#include "Settings.h"
+#include "Config.h"
 
 
 namespace
@@ -39,12 +39,16 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface * 
 
 extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
 {
-	INFO("{} loaded", Version::PROJECT);
+	INFO("{} v{} loaded", Version::PROJECT, Version::NAME);
 
 	SKSE::Init(a_skse);
-	SKSE::AllocTrampoline(1 << 5);
 
-	Hooks::InstallHooks();
+	Config::Load();
+
+	if (*Config::EnableUE) {
+		SKSE::AllocTrampoline(1 << 5);
+		Hooks::Install();
+	}
 
 	const auto* const message = SKSE::GetMessagingInterface();
 	if (!message->RegisterListener(MessageHandler)) {

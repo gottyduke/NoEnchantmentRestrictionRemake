@@ -1,0 +1,6 @@
+[ExperimentalReallyReallyExperimental]
+EnableDisenchantEverything = true
+
+[OhGimmeThoseSlots]
+EnableUnlimitedEnchantment = true
+EnchantmentMaxSlots = 8

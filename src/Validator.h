@@ -1,6 +1,9 @@
 #pragma once
 
 
+#include "Config.h"
+
+
 class Validator
 {
 public:

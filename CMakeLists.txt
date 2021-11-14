@@ -67,7 +67,6 @@ add_library(
 	${SOURCES}
 	${CMAKE_CURRENT_BINARY_DIR}/include/Version.h
 	${CMAKE_CURRENT_BINARY_DIR}/version.rc
-	.editorconfig
 )
 
 target_compile_features(

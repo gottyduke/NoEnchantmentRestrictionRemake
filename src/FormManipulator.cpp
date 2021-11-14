@@ -6,14 +6,15 @@ namespace FormManipulator
 {
 	void ReplaceForm()
 	{
-		Validator validator;
+		auto validator = std::make_unique<Validator>();
+
 		validator->PreloadEnchantmentList();
 		validator->PreloadKeywordList();
 
 		auto factory = RE::IFormFactory::GetConcreteFormFactoryByType<RE::BGSListForm>();
 		auto list = factory->Create();
 
-		list->forms.resize(validator->GetKeywordsAmount());
+		list->forms.resize(static_cast<std::uint32_t>(validator->GetKeywordsAmount()));
 		for (auto& keyword : validator->GetLoadedKeywords()) {
 			list->forms.push_back(std::move(keyword));
 		}
