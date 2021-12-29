@@ -1,20 +1,22 @@
 #pragma once
 
 
+// AdditionalInclude
+
+
+// CommonLib
 #include "RE/Skyrim.h"
 #include "SKSE/SKSE.h"
 
-#include "DKUtil/Logger.hpp"
+using namespace std::literals;
 
-
-#include <unordered_set> // unordered_set
-#include <unordered_map> // unordered_map
-
-
+// Version
 #include "Version.h"
 
-
-using namespace std::literals;
+// DKUtil
+#include "DKUtil/Config.hpp"
+#include "DKUtil/Hook.hpp"
+#include "DKUtil/Logger.hpp"
 
 
 #define DLLEXPORT __declspec(dllexport)

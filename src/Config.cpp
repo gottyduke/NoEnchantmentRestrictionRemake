@@ -10,13 +10,13 @@ namespace Config
 
 	void Load()
 	{
-		auto Main = COMPILE_PROXY("NoEnchantmentRestrictionRemake.toml"sv);
+		auto mainConfig = COMPILE_PROXY("NoEnchantmentRestrictionRemake.toml"sv);
 
-		Main.Bind(EnableDE, true);
-		Main.Bind(EnableUE, true);
-		Main.Bind(UEMax, 8);
+		mainConfig.Bind(EnableDE, true);
+		mainConfig.Bind(EnableUE, true);
+		mainConfig.Bind(UEMax, 3);
 
-		Main.Load();
+		mainConfig.Load();
 
 		INFO("Config Loaded"sv);
 	}

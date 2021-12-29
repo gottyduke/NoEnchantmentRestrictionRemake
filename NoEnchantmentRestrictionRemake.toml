@@ -3,4 +3,4 @@ EnableDisenchantEverything = true
 
 [OhGimmeThoseSlots]
 EnableUnlimitedEnchantment = true
-EnchantmentMaxSlots = 8
+EnchantmentMaxSlots = 3

@@ -1,10 +1,14 @@
 {
     "name":  "nerr",
-    "version-string":  "2.4.1",
-    "description":  "An SKSE plugin for skyrim special edition.",
+    "version-string":  "2.4.3",
+    "description":  "An SKSE plugin removing all enchantment related restrictions in game",
     "license":  "MIT",
     "dependencies":  [
-                         "boost-stl-interfaces",
                          "spdlog"
-                     ]
+                     ],
+    "features":  {
+                     "mo2-install":  {
+                                         "description":  "NoEnchantmentRestrictionRemake"
+                                     }
+                 }
 }

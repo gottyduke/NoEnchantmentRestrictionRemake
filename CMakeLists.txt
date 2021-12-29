@@ -1,7 +1,10 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.19)
 
-if (NOT LINKAGE_OVERRIDE)
 set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+if(${MTD})
+set(VCPKG_TARGET_TRIPLET "x64-windows-static-md" CACHE STRING "")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL" CACHE STRING "")
+else()
 set(VCPKG_TARGET_TRIPLET "x64-windows-static" CACHE STRING "")
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
 endif()
@@ -9,16 +12,13 @@ endif()
 # info
 project(
 	NoEnchantmentRestrictionRemake
-	VERSION 2.4.1
+	VERSION 2.4.3
 	LANGUAGES CXX
 )
 
 # out-of-source builds only
-if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
-	message(
-		FATAL_ERROR
-			"In-source builds are not allowed."
-	)
+if(${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR})
+	message(FATAL_ERROR "In-source builds are not allowed.")
 endif()
 
 configure_file(
@@ -47,17 +47,13 @@ find_package(spdlog CONFIG REQUIRED)
 execute_process(COMMAND powershell -ExecutionPolicy Bypass -File "${CMAKE_CURRENT_SOURCE_DIR}/!Update.ps1" "SOURCEGEN" "${PROJECT_VERSION}" "${CMAKE_CURRENT_BINARY_DIR}")
 include(${CMAKE_CURRENT_BINARY_DIR}/sourcelist.cmake)
 source_group(
-	TREE
-		${CMAKE_CURRENT_SOURCE_DIR}
-	FILES
-		${SOURCES}
+	TREE ${CMAKE_CURRENT_SOURCE_DIR}
+	FILES ${SOURCES}
 )
 
 source_group(
-	TREE
-		${CMAKE_CURRENT_BINARY_DIR}
-	FILES
-		${CMAKE_CURRENT_BINARY_DIR}/include/Version.h
+	TREE ${CMAKE_CURRENT_BINARY_DIR}
+	FILES ${CMAKE_CURRENT_BINARY_DIR}/include/Version.h
 )
 
 # runtime
@@ -92,7 +88,7 @@ target_link_libraries(
 )
 
 # compiler
-if (MSVC)
+if(MSVC)
 	add_compile_definitions(
 		_UNICODE
 	)
@@ -147,7 +143,7 @@ if (MSVC)
 			"$<$<CONFIG:DEBUG>:/INCREMENTAL;/OPT:NOREF;/OPT:NOICF>"
 			"$<$<CONFIG:RELEASE>:/INCREMENTAL:NO;/OPT:REF;/OPT:ICF;/DEBUG:FULL>"
 	)
-endif ()
+endif()
 
 # pch
 target_precompile_headers(
@@ -162,9 +158,9 @@ add_custom_command(
 		${PROJECT_NAME}
 	POST_BUILD
 		COMMAND 
-			powershell -NoProfile -ExecutionPolicy Bypass -File "${CMAKE_CURRENT_SOURCE_DIR}/!Update.ps1" "COPY" "${PROJECT_VERSION}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$(ConfigurationName)" "${PROJECT_NAME}"
+			powershell -NoProfile -ExecutionPolicy Bypass -File "${CMAKE_CURRENT_SOURCE_DIR}/!Update.ps1" "COPY" "${PROJECT_VERSION}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$(ConfigurationName)" "${PROJECT_NAME}" "${ANNIVERSARY_EDITION}"
 		COMMENT 
-			"Updating DLL to MO2 directory..."
+			"Updating project :))"
 )
 
 # called via !Rebuild.ps1

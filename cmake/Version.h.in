@@ -1,5 +1,6 @@
 #pragma once
 
+
 namespace Version
 {
 	inline constexpr std::size_t MAJOR = @PROJECT_VERSION_MAJOR@;
