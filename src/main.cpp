@@ -1,6 +1,6 @@
-#include "FormManipulator.h"
-#include "Hooks.h"
 #include "Config.h"
+#include "Forms.h"
+#include "Hooks.h"
 
 
 namespace
@@ -8,7 +8,7 @@ namespace
 	void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 	{
 		if (a_msg->type == SKSE::MessagingInterface::kDataLoaded) {
-			FormManipulator::ReplaceForm();
+			Forms::PatchAll();
 		}
 	}
 }
@@ -77,11 +77,6 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 	Config::Load();
 
 	if (*Config::EnableUE) {
-#if !ANNIVERSARY_EDITION
-
-#endif
-		SKSE::AllocTrampoline(1 << 6);
-
 		Hooks::Install();
 	}
 

@@ -8,8 +8,17 @@ namespace Hooks
 
 	// 1-6-323: 0x894EE0 + 0x212
 	constexpr std::uint64_t FuncID = 51242;
-	constexpr std::uintptr_t OffsetLow = 0x212;
-	constexpr std::uintptr_t OffsetHigh = 0x243;
+	constexpr std::ptrdiff_t OffsetLow = 0x212;
+	constexpr std::ptrdiff_t OffsetHigh = 0x243;
+
+#else
+
+	// 1-5-97: 0x866E20 + 0x1CD
+	constexpr std::uint64_t FuncID = 50329;
+	constexpr std::ptrdiff_t OffsetLow = 0x1CD;
+	constexpr std::ptrdiff_t OffsetHigh = 0x1FF;
+
+#endif
 
 	constexpr OpCode AsmSrc[]{
 		0xB8,					// mov eax,
@@ -17,29 +26,7 @@ namespace Hooks
 	};
 
 	// opcode
-	constexpr std::uintptr_t ImmediateOffset = sizeof(OpCode);
-
-#else
-
-	constexpr std::uint64_t FuncID = 50565;
-	constexpr std::uintptr_t OffsetLow = 0x24;
-	constexpr std::uintptr_t OffsetHigh = 0x2A;
-
-	constexpr DKUtil::Hook::Patch Prolog = {
-		"\x31\xED\xC7\x86\x98\x01\x00\x00\x00\x00\x00\x00",
-		12,
-	};
-
-	constexpr DKUtil::Hook::Patch Epilog = {
-		"\x48\x89\x69\xE0",
-		4
-	};
-
-	// placeholding bytes | epilog | JmpRel
-	constexpr std::uintptr_t ImmediateOffset = sizeof(DKUtil::Hook::Imm32) + Epilog.Size + sizeof(DKUtil::Hook::detail::JmpRel);
-
-#endif
-
+	constexpr std::ptrdiff_t ImmediateOffset = sizeof(OpCode);
 
 	HookHandle _Hook_UES;
 

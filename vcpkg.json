@@ -1,6 +1,6 @@
 {
     "name":  "nerr",
-    "version-string":  "2.4.3",
+    "version-string":  "3.0.0",
     "description":  "An SKSE plugin removing all enchantment related restrictions in game",
     "license":  "MIT",
     "dependencies":  [
