@@ -1,11 +1,5 @@
 cmake_minimum_required(VERSION 3.19)
 
-if(${GITHUB_CI})
-set(ENV{VCPKG_ROOT} $ENV{VCPKG_INSTALLATION_ROOT})
-set(ENV{CommonLibSSEPath} $ENV{CLIB_PATH})
-set(ENV{DKUtilPath} $ENV{DKU_PATH})
-endif()
-
 set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 if(${MTD})
 set(VCPKG_TARGET_TRIPLET "x64-windows-static-md" CACHE STRING "")
@@ -42,6 +36,7 @@ configure_file(
 # global
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG OFF)
+set(Boost_USE_STATIC_LIBS ON)
 
 # dependencies
 add_subdirectory($ENV{CommonLibSSEPath} CommonLibSSE)
@@ -158,7 +153,6 @@ target_precompile_headers(
 )
 
 # post build event
-if(NOT GITHUB_CI)
 add_custom_command(
 	TARGET 
 		${PROJECT_NAME}
@@ -168,7 +162,6 @@ add_custom_command(
 		COMMENT 
 			"Updating project :))"
 )
-endif()
 
 # called via !Rebuild.ps1
 if(DEFINED GROUP)
