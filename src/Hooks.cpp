@@ -4,21 +4,15 @@
 
 namespace Hooks
 {
-#if ANNIVERSARY_EDITION
-
 	// 1-6-323: 0x894EE0 + 0x212
-	constexpr std::uint64_t FuncID = 51242;
-	constexpr std::ptrdiff_t OffsetLow = 0x212;
-	constexpr std::ptrdiff_t OffsetHigh = 0x243;
-
-#else
+	constexpr std::uint64_t AE_FuncID = 51242;
+	constexpr std::ptrdiff_t AE_OffsetL = 0x212;
+	constexpr std::ptrdiff_t AE_OffsetH = 0x243;
 
 	// 1-5-97: 0x866E20 + 0x1CD
-	constexpr std::uint64_t FuncID = 50329;
-	constexpr std::ptrdiff_t OffsetLow = 0x1CD;
-	constexpr std::ptrdiff_t OffsetHigh = 0x1FF;
-
-#endif
+	constexpr std::uint64_t SE_FuncID = 50329;
+	constexpr std::ptrdiff_t SE_OffsetL = 0x1CD;
+	constexpr std::ptrdiff_t SE_OffsetH = 0x1FF;
 
 	constexpr OpCode AsmSrc[]{
 		0xB8,					// mov eax,
@@ -33,17 +27,10 @@ namespace Hooks
 
 	void Install()
 	{
-		static std::once_flag HookInit;
-		std::call_once(HookInit, [&]()
-			{
-				constexpr Patch AsmPatch = {
-					std::addressof(AsmSrc),
-					sizeof(AsmSrc)
-				};
-
-				_Hook_UES = DKUtil::Hook::AddASMPatch<OffsetLow, OffsetHigh>(DKUtil::Hook::IDToAbs(FuncID), &AsmPatch);
-			}
-		);
+		_Hook_UES = DKUtil::Hook::AddASMPatch(
+			DKUtil::Hook::IDToAbs(AE_FuncID, SE_FuncID),
+			DKUtil::Hook::RuntimeOffset(AE_OffsetL, AE_OffsetH, SE_OffsetL, SE_OffsetH),
+			{ &AsmSrc, std::extent_v<decltype(AsmSrc)> });
 
 		_Hook_UES->Enable();
 
