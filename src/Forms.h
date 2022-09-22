@@ -24,7 +24,7 @@ namespace Forms
 		[[nodiscard]] auto GetEnchantmentsAmount() const noexcept { return static_cast<std::uint32_t>(_enchantments.size()); }
 		[[nodiscard]] auto GetKeywordsAmount() const noexcept { return static_cast<std::uint32_t>(_keywords.size()); }
 	private:
-		ENIT NestedValidate(const ENIT a_ench);
+		ENIT BaseEnchantment(const ENIT a_ench);
 		void DumpStats();
 
 

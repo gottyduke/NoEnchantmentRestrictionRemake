@@ -10,7 +10,7 @@ namespace Forms
 		auto& enchantments = dataHandler->GetFormArray<RE::EnchantmentItem>();
 
 		for (auto& enchantment : enchantments) {
-			if (auto* base = NestedValidate(enchantment);
+			if (auto* base = BaseEnchantment(enchantment);
 				base && !base->fullName.empty() && !_enchantments.count(base)) {
 				_enchantments.emplace(base);
 
@@ -47,19 +47,32 @@ namespace Forms
 		auto* emptyForm = factory->Create();
 
 		for (auto* form : a_array) {
-			const auto count = form->GetNumKeywords();
-			if (!count) {
+			if (!form->GetNumKeywords()) {
 				continue;
 			}
 
-			for (std::uint32_t index = 0; index < count; ++index) {
+			for (std::uint32_t index = 0; index < form->GetNumKeywords(); ++index) {
+				// Recalculate count each cycle to avoid UB.
+				auto count = form->GetNumKeywords();
 				if (!form->GetKeywordAt(index).has_value()) {
 					continue;
 				}
 
-				// DE option
-				if (*Config::EnableDE && form->keywords[index]->GetFormID() == 0x000C27BD) {
-					form->keywords[index] = emptyForm;
+				// DE option.
+				// Only remove the keyword if disenchant everything is enabled and the object has a name.
+				if (*Config::EnableDE &&
+					form->keywords[index]->GetFormID() == 0x000C27BD &&
+					!form->fullName.empty()) {
+					// If we are not at the end of the list:
+					if (count - index > 1) {
+						// Swap with the end of the list.
+						form->keywords[index] = form->keywords[count - 1];
+
+					} else {
+						// Otherwise set the value to empty form.
+						form->keywords[index] = emptyForm;
+					}
+					// Truncate the array, removing our position if this is the end, or the position we swapped the bad value to.
 					--form->numKeywords;
 					continue;
 				}
@@ -71,12 +84,18 @@ namespace Forms
 
 
 	// nested validator to find the very base form
-	auto Validator::NestedValidate(const ENIT a_ench)
+	// patch from jsa2352
+	auto Validator::BaseEnchantment(const ENIT a_ench)
 		-> ENIT
 	{
-		return (a_ench->data.baseEnchantment && a_ench != a_ench->data.baseEnchantment)
-			? NestedValidate(a_ench->data.baseEnchantment)
-			: a_ench;
+		auto ench = a_ench;
+		while (true) {
+			if (!ench->data.baseEnchantment)
+				return ench;
+			if (ench == ench->data.baseEnchantment)
+				return ench;
+			ench = ench->data.baseEnchantment;
+		}
 	}
 
 
