@@ -2,7 +2,6 @@
 #include "Forms.h"
 #include "Hooks.h"
 
-
 namespace
 {
 	void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
@@ -13,17 +12,16 @@ namespace
 	}
 }
 
-
 DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
 {
 #ifndef NDEBUG
-	while (!IsDebuggerPresent()) { Sleep(100); }
+	//while (!IsDebuggerPresent()) { Sleep(100); }
 #endif
 
 	DKUtil::Logger::Init(Plugin::NAME, REL::Module::get().version().string());
 
 	SKSE::Init(a_skse);
-	
+
 	INFO("{} v{} loaded", Plugin::NAME, Plugin::Version);
 
 	// do stuff

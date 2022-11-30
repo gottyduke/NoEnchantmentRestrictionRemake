@@ -1,15 +1,55 @@
 #include "Forms.h"
 #include "Config.h"
 
-
 namespace Forms
 {
-	void Validator::LoadEnchantmentList()
+	void Validator::ResolveExclusion()
 	{
 		auto* dataHandler = RE::TESDataHandler::GetSingleton();
-		auto& enchantments = dataHandler->GetFormArray<RE::EnchantmentItem>();
 
-		for (auto& enchantment : enchantments) {
+		for (auto& ex : Config::Exclusion.get_collection()) {
+			auto list = dku::string::split(ex, "|"sv);
+			if (list.size() < 2) {
+				continue;
+			}
+
+			auto* file = dataHandler->LookupLoadedModByName(list.back()) ?
+			                 dataHandler->LookupLoadedModByName(list.back()) :
+			                 dataHandler->LookupLoadedLightModByName(list.back());
+			if (!file) {
+				continue;
+			} else {
+				list.pop_back();
+			}
+
+			if (list.front() == "*") {
+				_excludedFile.emplace(file);
+				INFO("Excluding plugin: {}", file->fileName);
+			} else {
+				for (auto& idStr : list) {
+					auto id = dku::string::lexical_cast<RE::FormID>(idStr, true);
+					if (auto* form = dataHandler->LookupForm(id, file->fileName); form && form->As<ENIT>()) {
+						_excludedEnch.emplace(form->As<ENIT>());
+						INFO("Excluding entry: {:X} | {}", id, file->fileName);
+					}
+				}
+			}
+		}
+	}
+
+	void Validator::LoadEnchantmentList()
+	{
+		ResolveExclusion();
+
+		auto* dataHandler = RE::TESDataHandler::GetSingleton();
+		auto& enchantments = dataHandler->GetFormArray<ENIT>();
+
+		for (auto* enchantment : enchantments) {
+			if (_excludedFile.contains(enchantment->GetFile()) || _excludedEnch.contains(enchantment)) {
+				DEBUG("Skipping excluded entry: {}({:X}) | {}", enchantment->GetName(), enchantment->GetFormID(), enchantment->GetFile()->fileName)
+				continue;
+			}
+
 			if (auto* base = BaseEnchantment(enchantment);
 				base && !base->fullName.empty() && !_enchantments.count(base)) {
 				_enchantments.emplace(base);
@@ -24,7 +64,6 @@ namespace Forms
 		DEBUG("Enchantments preloaded"sv);
 	}
 
-
 	void Validator::LoadKeywordList()
 	{
 		auto* dataHandler = RE::TESDataHandler::GetSingleton();
@@ -34,16 +73,15 @@ namespace Forms
 		LoadKeywordList<RE::TESObjectARMO>(armorList);
 		LoadKeywordList<RE::TESObjectWEAP>(weaponList);
 
-		_keywords.erase(RE::TESForm::LookupByID<RE::BGSKeyword>(0x000C27BD));
+		_keywords.erase(RE::TESForm::LookupByID<KWDA>(0x0C27BD));
 
 		DEBUG("Keywords preloaded"sv);
 	}
 
-
 	template <typename T>
 	void Validator::LoadKeywordList(RE::BSTArray<T*>& a_array)
 	{
-		auto* factory = RE::IFormFactory::GetConcreteFormFactoryByType<RE::BGSKeyword>();
+		auto* factory = RE::IFormFactory::GetConcreteFormFactoryByType<KWDA>();
 		auto* emptyForm = factory->Create();
 
 		for (auto* form : a_array) {
@@ -61,7 +99,7 @@ namespace Forms
 				// DE option.
 				// Only remove the keyword if disenchant everything is enabled and the object has a name.
 				if (*Config::EnableDE &&
-					form->keywords[index]->GetFormID() == 0x000C27BD &&
+					form->keywords[index]->GetFormID() == 0x0C27BD &&
 					!form->fullName.empty()) {
 					// If we are not at the end of the list:
 					if (count - index > 1) {
@@ -82,44 +120,40 @@ namespace Forms
 		}
 	}
 
-
 	// nested validator to find the very base form
 	// patch from jsa2352
-	auto Validator::BaseEnchantment(const ENIT a_ench)
-		-> ENIT
+	auto Validator::BaseEnchantment(ENIT* a_ench)
+		-> ENIT*
 	{
-		auto ench = a_ench;
+		auto* ench = a_ench;
 		while (true) {
-			if (!ench->data.baseEnchantment)
+			if (!ench->data.baseEnchantment ||
+				ench == ench->data.baseEnchantment) {
 				return ench;
-			if (ench == ench->data.baseEnchantment)
-				return ench;
+			}
 			ench = ench->data.baseEnchantment;
 		}
 	}
 
-
 	void Validator::DumpStats()
 	{
-		INFO("Stat report:"sv);
-		INFO("Enchantments processed: {}", GetEnchantmentsAmount());
-		INFO("Keywords processed: {}", GetKeywordsAmount());
+		auto raw = _stats | std::views::transform([this](auto& pair) { return fmt::format("{:4d} ({:04.1f}%)[{}]", pair.second, static_cast<float>(pair.second) / GetEnchantmentsAmount() * 100, pair.first); });
+		INFO("\n{:->45}\nStat report:\nEnchantments processed: {}\nKeywords processed: {}\n{:->45}\n{}\n{:->45}", "", GetEnchantmentsAmount(), GetKeywordsAmount(), "", dku::string::join({ raw.begin(), raw.end() }, "\n"sv), "");
 
-		for (auto& [file, count] : _stats) {
-			INFO("{:3d} ({:04.1f}%)[{}]", count, static_cast<float>(count) / GetEnchantmentsAmount() * 100, file);
+		if (spdlog::get_level() == spdlog::level::debug) {
+			DEBUG("Form dump:"sv);
+
+			for (auto& keyword : _keywords) {
+				DEBUG("KWDA({:X})[{}]", keyword->GetFormID(), keyword->GetFormEditorID());
+			}
+
+			for (auto& enchantment : _enchantments) {
+				DEBUG("ENIT({:X})[{}]", enchantment->GetFormID(), enchantment->GetFullName());
+			}
 		}
 
-		DEBUG("Form dump:"sv);
-
-		for (auto& keyword : _keywords) {
-			DEBUG("KWDA({:X})[{}]", keyword->GetFormID(), keyword->GetFormEditorID());
-		}
-
-		for (auto& enchantment : _enchantments) {
-			DEBUG("ENIT({:X})[{}]", enchantment->GetFormID(), enchantment->GetFullName());
-		}
+		INFO("Exiting");
 	}
-
 
 	void PatchAll()
 	{

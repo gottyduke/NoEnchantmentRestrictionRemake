@@ -1,6 +1,18 @@
-[ExperimentalReallyReallyExperimental]
+[BreakItDown]
 EnableDisenchantEverything = true
 
 [OhGimmeThoseSlots]
 EnableUnlimitedEnchantment = true
 EnchantmentMaxSlots = 3
+
+[NoCanDo]
+# Add enchantment's FormID for exclusion, e.g. for Fortify Light Armor, add "10FB7A|Skyrim.esm" without the first two digits of mod index ( load order )
+# For ESPFE / ESL plugins, do not add 0xFE and load order index. e.g. 0xFE041C4F -> "C4F|LightModPluginName.esl"
+# You can find FormID in SSEEdit or CreationKit
+# For multiple entries from same plugin, you can add comma (,) between each FormID, e.g. "10FB7A,10FB7B,10FB7C,10FB7D|Skyrim.esm" or list them separately
+# To exclude all enchantments from a plugin entirely, e.g. from Odin.esp, add "*|Odin.esp"
+ExcludedEnchantments = [
+    "0|Example.esp",
+    # Wrap with double quotation marks ("), separated by mandatory comma (,) and optional new line
+    # Add below
+]

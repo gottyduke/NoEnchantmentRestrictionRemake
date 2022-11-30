@@ -1,7 +1,6 @@
 #include "Hooks.h"
 #include "Config.h"
 
-
 namespace Hooks
 {
 	// 1-6-323: 0x894EE0 + 0x212
@@ -15,15 +14,14 @@ namespace Hooks
 	constexpr std::ptrdiff_t SE_OffsetH = 0x1FF;
 
 	constexpr OpCode AsmSrc[]{
-		0xB8,					// mov eax,
-		0x00, 0x00, 0x00, 0x00, // Imm32
+		0xB8,                    // mov eax,
+		0x00, 0x00, 0x00, 0x00,  // Imm32
 	};
 
 	// opcode
 	constexpr std::ptrdiff_t ImmediateOffset = sizeof(OpCode);
 
 	HookHandle _Hook_UES;
-
 
 	void Install()
 	{
@@ -38,7 +36,6 @@ namespace Hooks
 
 		INFO("Hooks installed"sv);
 	}
-
 
 	void Uninstall()
 	{
