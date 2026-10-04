@@ -13,7 +13,7 @@ include(GNUInstallDirs)
 # info
 project(
 	NoEnchantmentRestrictionRemake
-	VERSION 3.0.2
+	VERSION 3.1.0
 	LANGUAGES CXX
 )
 
@@ -93,7 +93,6 @@ if (MSVC)
 		${PROJECT_NAME}
 		PRIVATE
 			/MP
-			/await
 			/W0
 			/WX
 			/permissive-
