@@ -15,7 +15,9 @@ namespace
 DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
 {
 #ifndef NDEBUG
-	//while (!IsDebuggerPresent()) { Sleep(100); }
+	if (!IsDebuggerPresent()) {
+		MessageBoxA(nullptr, "Waiting for debugger", Plugin::NAME.data(), MB_OK);
+	}
 #endif
 
 	DKUtil::Logger::Init(Plugin::NAME, REL::Module::get().version().string());

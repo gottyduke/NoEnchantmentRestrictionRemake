@@ -137,7 +137,10 @@ namespace Forms
 
 	void Validator::DumpStats()
 	{
-		auto raw = _stats | std::views::transform([this](auto& pair) { return fmt::format("{:4d} ({:04.1f}%)[{}]", pair.second, static_cast<float>(pair.second) / GetEnchantmentsAmount() * 100, pair.first); });
+		std::vector<std::pair<std::string_view, std::uint32_t>> sorted{ _stats.begin(), _stats.end() };
+		std::ranges::sort(sorted, [](auto& a_lhs, auto& a_rhs) { return a_lhs.second > a_rhs.second; });
+
+		auto raw = sorted | std::views::transform([this](auto& pair) { return fmt::format("{:4d} ({:04.1f}%)[{}]", pair.second, static_cast<float>(pair.second) / GetEnchantmentsAmount() * 100, pair.first); });
 		INFO("\n{:->45}\nStat report:\nEnchantments processed: {}\nKeywords processed: {}\n{:->45}\n{}\n{:->45}", "", GetEnchantmentsAmount(), GetKeywordsAmount(), "", dku::string::join({ raw.begin(), raw.end() }, "\n"sv), "");
 
 		if (spdlog::get_level() == spdlog::level::debug) {
